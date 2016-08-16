@@ -31,12 +31,12 @@ public final class Thread {
     #if os(Linux)
     #else
     /// Transform a signal to the main queue
-    public static func main<T>(_ a: T, completion: (T) -> Void) {
+    public static func main<T>(_ a: T, completion: @escaping (T) -> Void) {
         queue(DispatchQueue.main)(a, completion)
     }
 
     /// Transform the signal to a specified queue
-    public static func queue<T>(_ queue: DispatchQueue) -> (T, (T) -> Void) -> Void {
+    public static func queue<T>(_ queue: DispatchQueue) -> (T, @escaping (T) -> Void) -> Void {
         return { a, completion in
             queue.async {
                 completion(a)
@@ -46,7 +46,7 @@ public final class Thread {
 
     /// Transform the signal to a global background queue with priority default
   @available(OSX 10.10, *)
-  public static func background<T>(_ a: T, completion: (T) -> Void) {
+  public static func background<T>(_ a: T, completion: @escaping (T) -> Void) {
         let q = DispatchQueue.global()
         q.async {
           completion(a)

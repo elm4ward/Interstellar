@@ -39,7 +39,7 @@ public extension Signal {
             func updateIfNeeded(_ signal: Signal<T>) -> (Result<T>) -> Void {
                 return { result in
                     let timeSinceLastCall = lastCalled?.timeIntervalSinceNow
-                    if timeSinceLastCall == nil || timeSinceLastCall <= -seconds {
+                    if timeSinceLastCall == nil || timeSinceLastCall! <= -seconds {
                         // no update before or update outside of debounce window
                         lastCalled = Date()
                         signal.update(result)
@@ -78,7 +78,7 @@ public extension Observable {
             func updateIfNeeded(_ observable: Observable<T>) -> (T) -> Void {
                 return { value in
                     let timeSinceLastCall = lastCalled?.timeIntervalSinceNow
-                    if timeSinceLastCall == nil || timeSinceLastCall <= -seconds {
+                    if timeSinceLastCall == nil || timeSinceLastCall! <= -seconds {
                         // no update before or update outside of debounce window
                         lastCalled = Date()
                         observable.update(value)

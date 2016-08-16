@@ -57,7 +57,7 @@ public final class Signal<T> {
     /**
         Transform the signal into another signal using a function.
     */
-    public func map<U>(_ f: (T) -> U) -> Signal<U> {
+    public func map<U>(_ f: @escaping (T) -> U) -> Signal<U> {
         let signal = Signal<U>()
         subscribe { result in
             signal.update(result.map(f))
@@ -68,7 +68,7 @@ public final class Signal<T> {
     /**
         Transform the signal into another signal using a function.
     */
-    public func flatMap<U>(_ f: (T) -> Result<U>) -> Signal<U> {
+    public func flatMap<U>(_ f: @escaping (T) -> Result<U>) -> Signal<U> {
         let signal = Signal<U>()
         subscribe { result in
             signal.update(result.flatMap(f))
@@ -79,7 +79,7 @@ public final class Signal<T> {
     /**
     Transform the signal into another signal using a function.
     */
-    public func flatMap<U>(_ f: (T) throws -> U) -> Signal<U> {
+    public func flatMap<U>(_ f: @escaping (T) throws -> U) -> Signal<U> {
         let signal = Signal<U>()
         subscribe { result in
             signal.update(result.flatMap(f))
@@ -90,7 +90,7 @@ public final class Signal<T> {
     /**
         Transform the signal into another signal using a function.
     */
-    public func flatMap<U>(_ f: (T, ((Result<U>) -> Void)) -> Void) -> Signal<U> {
+    public func flatMap<U>(_ f: @escaping (T, ((Result<U>) -> Void)) -> Void) -> Signal<U> {
         let signal = Signal<U>()
         subscribe { result in
             result.flatMap(f)(signal.update)
@@ -124,7 +124,7 @@ public final class Signal<T> {
         This method can also be used to convert an .error into a .success which might be handy
         for retry logic.
     */
-    public func ensure<U>(_ f: (Result<T>, ((Result<U>) -> Void)) -> Void) -> Signal<U> {
+    public func ensure<U>(_ f: @escaping (Result<T>, ((Result<U>) -> Void)) -> Void) -> Signal<U> {
         let signal = Signal<U>()
         subscribe { result in
             f(result) { signal.update($0) }
@@ -137,7 +137,7 @@ public final class Signal<T> {
         This method is chainable.
     */
     @discardableResult
-    public func subscribe(_ f: (Result<T>) -> Void) -> Signal<T> {
+    public func subscribe(_ f: @escaping (Result<T>) -> Void) -> Signal<T> {
         if let value = value {
             f(value)
         }
@@ -147,7 +147,7 @@ public final class Signal<T> {
         return self
     }
 
-    public func filter(_ f: (T) -> Bool) -> Signal<T> {
+    public func filter(_ f: @escaping (T) -> Bool) -> Signal<T> {
         let signal = Signal<T>()
         subscribe { result in
             switch result {
@@ -166,7 +166,7 @@ public final class Signal<T> {
         This method is chainable.
     */
     @discardableResult
-    public func next(_ g: (T) -> Void) -> Signal<T> {
+    public func next(_ g: @escaping (T) -> Void) -> Signal<T> {
         subscribe { result in
             switch result {
             case let .success(value): g(value)
@@ -181,7 +181,7 @@ public final class Signal<T> {
         This method is chainable.
     */
     @discardableResult
-    public func error(_ g: (Error) -> Void) -> Signal<T> {
+    public func error(_ g: @escaping (Error) -> Void) -> Signal<T> {
         subscribe { result in
             switch result {
             case .success(_): return

@@ -36,7 +36,7 @@ public final class Observable<T> {
     }
 
     @discardableResult
-    public func subscribe(_ observer: (T) -> Void) -> ObserverToken<T> {
+    public func subscribe(_ observer: @escaping (T) -> Void) -> ObserverToken<T> {
         var token: ObserverToken<T>!
         mutex.lock {
             let newHashValue = nextTokenHash()
@@ -73,7 +73,7 @@ public final class Observable<T> {
         return (observers.keys.map({$0.hashValue}).max() ?? -1) + 1
     }
 
-    private func unsubscribe(_ token: ObserverToken<T>) {
+    fileprivate func unsubscribe(_ token: ObserverToken<T>) {
         mutex.lock {
             observers[token] = nil
         }
@@ -85,7 +85,7 @@ public final class ObserverToken<T>: Hashable {
     private weak var observable: Observable<T>?
 
     // Private to avoid instantiation outside this file.
-    private init (hashValue: Int, observable: Observable<T>?) {
+    fileprivate init (hashValue: Int, observable: Observable<T>?) {
         self.hashValue = hashValue
         self.observable = observable
     }
@@ -100,13 +100,13 @@ public func == <T>(lhs: ObserverToken<T>, rhs: ObserverToken<T>) -> Bool {
 }
 
 extension Observable {
-    public func map<U>(_ transform: (T) -> U) -> Observable<U> {
+    public func map<U>(_ transform: @escaping (T) -> U) -> Observable<U> {
         let observable = Observable<U>(options: options)
         subscribe { observable.update(transform($0)) }
         return observable
     }
 
-    public func map<U>(_ transform: (T) throws -> U) -> Observable<Result<U>> {
+    public func map<U>(_ transform: @escaping (T) throws -> U) -> Observable<Result<U>> {
         let observable = Observable<Result<U>>(options: options)
         subscribe { value in
             observable.update(Result(block: { return try transform(value) }))
@@ -114,7 +114,7 @@ extension Observable {
         return observable
     }
 
-    public func flatMap<U>(_ transform: (T) -> Observable<U>) -> Observable<U> {
+    public func flatMap<U>(_ transform: @escaping (T) -> Observable<U>) -> Observable<U> {
         let observable = Observable<U>(options: options)
         subscribe { transform($0).subscribe(observable.update) }
         return observable
