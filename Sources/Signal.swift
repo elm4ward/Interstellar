@@ -124,7 +124,7 @@ public final class Signal<T> {
         This method can also be used to convert an .error into a .success which might be handy
         for retry logic.
     */
-    public func ensure<U>(_ f: @escaping (Result<T>, ((Result<U>) -> Void)) -> Void) -> Signal<U> {
+    public func ensure<U>(_ f: @escaping (Result<T>, (@escaping (Result<U>) -> Void)) -> Void) -> Signal<U> {
         let signal = Signal<U>()
         subscribe { result in
             f(result) { signal.update($0) }
