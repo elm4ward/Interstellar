@@ -102,7 +102,7 @@ public final class Signal<T> {
         Transform the signal into another signal using a function, return the
         value of the inner signal
     */
-    public func flatMap<U>(_ f: ((T) -> Signal<U>)) -> Signal<U> {
+    public func flatMap<U>(_ f: @escaping ((T) -> Signal<U>)) -> Signal<U> {
         let signal = Signal<U>()
         subscribe { result in
             switch result {
